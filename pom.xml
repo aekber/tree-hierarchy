@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.dumbo</groupId>
-	<artifactId>tree-structure</artifactId>
+	<artifactId>tree-hierarchy</artifactId>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -60,7 +60,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>tree-structure</finalName>
+		<finalName>tree-hierarchy</finalName>
 	</build>
 
 </project>
