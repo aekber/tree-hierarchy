@@ -16,7 +16,10 @@ public class Tree {
     @Column(name = "parent")
     private Integer parent;
 
+    @Transient
     private Long root;
+
+    @Transient
     private Integer level;
 
     public Tree() {

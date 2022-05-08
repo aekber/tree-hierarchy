@@ -6,10 +6,8 @@ import org.dumbo.model.Tree;
 import org.dumbo.model.TreeDTO;
 import org.dumbo.repository.TreeRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TreeService {
@@ -19,14 +17,31 @@ public class TreeService {
         this.treeRepository = treeRepository;
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Tree> getNodeById(Long id) {
+        Optional<Tree> node = treeRepository.findById(id);
+        return node;
+    }
 
     @Transactional(readOnly = true)
-    public List<TreeDTO> getDescendants(int id) {
+    public List<TreeDTO> getNodeDescendants(Long id) {
         List<Tree> nodes = treeRepository.getDescendantsByNodeId(id);
+        return nodes.stream().map(node -> new TreeDTO(node.getId(), node.getParent(), node.getRoot(), node.getLevel())).collect(Collectors.toList());
+    }
 
-        List<TreeDTO> nodeDTOList = new ArrayList<>();
-        nodes.iterator().forEachRemaining(currentNode ->  nodeDTOList.add(new TreeDTO(currentNode.getId(), currentNode.getParent(), currentNode.getRoot(), currentNode.getLevel())));
-        return nodeDTOList;
+    @Transactional
+    public void addNode(String name, Integer parentId) {
+        treeRepository.save(new Tree(name, parentId));
+    }
+
+    @Transactional
+    public void changeNodeParent(Long id, Integer newParentId) {
+        Optional<Tree> node = treeRepository.findById(id);
+        node.ifPresent(tree -> {
+            tree.setParent(newParentId);
+            treeRepository.save(tree);
+        });
+
     }
 
 }
