@@ -1,1 +1,1 @@
-# tree-hierarchy content
+# tree-hierarchy description
