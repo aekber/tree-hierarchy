@@ -20,8 +20,8 @@ public class TreeController {
         this.treeService = treeService;
     }
 
-    @GetMapping("/getChildren")
-    public List<TreeDTO> getChildren(@RequestParam int id) {
-        return treeService.getChildren(id);
+    @GetMapping("/getDescendants")
+    public List<TreeDTO> getDescendants(@RequestParam int id) {
+        return treeService.getDescendants(id);
     }
 }

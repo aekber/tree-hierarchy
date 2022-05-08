@@ -2,7 +2,6 @@ package org.dumbo.model;
 
 import javax.persistence.*;
 
-
 @Entity
 @Table(name="nodes")
 public class Tree {
@@ -10,15 +9,20 @@ public class Tree {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name")
     private String name;
 
     @Column(name = "parent")
-    private String parent;
+    private Integer parent;
+
+    private Long root;
+    private Integer level;
 
     public Tree() {
     }
 
-    public Tree(String name, String parent) {
+    public Tree(String name, Integer parent) {
         this.name = name;
         this.parent = parent;
     }
@@ -39,11 +43,27 @@ public class Tree {
         this.name = name;
     }
 
-    public String getParent() {
+    public Integer getParent() {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(Integer parent) {
         this.parent = parent;
+    }
+
+    public Long getRoot() {
+        return root;
+    }
+
+    public void setRoot(Long root) {
+        this.root = root;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 }

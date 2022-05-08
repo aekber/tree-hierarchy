@@ -21,11 +21,11 @@ public class TreeService {
 
 
     @Transactional(readOnly = true)
-    public List<TreeDTO> getChildren(int id) {
-        List<Tree> nodes = treeRepository.getNodesByPath(id);
+    public List<TreeDTO> getDescendants(int id) {
+        List<Tree> nodes = treeRepository.getDescendantsByNodeId(id);
 
         List<TreeDTO> nodeDTOList = new ArrayList<>();
-        nodes.iterator().forEachRemaining(currentNode ->  nodeDTOList.add(new TreeDTO(currentNode.getId(), 0, 1L, 0)));
+        nodes.iterator().forEachRemaining(currentNode ->  nodeDTOList.add(new TreeDTO(currentNode.getId(), currentNode.getParent(), currentNode.getRoot(), currentNode.getLevel())));
         return nodeDTOList;
     }
 
