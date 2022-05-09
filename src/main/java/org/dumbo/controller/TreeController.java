@@ -1,9 +1,14 @@
 package org.dumbo.controller;
 
-import org.dumbo.model.Tree;
+import org.dumbo.exception.InvalidNodeParamException;
+import org.dumbo.exception.NodeNotFoundException;
+import org.dumbo.model.Node;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.dumbo.model.TreeDTO;
+import org.dumbo.model.NodeDTO;
 import org.dumbo.service.TreeService;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -19,22 +24,40 @@ public class TreeController {
     }
 
     @GetMapping("/get/{nodeId}")
-    public Tree getNodeById(@PathVariable Long nodeId) {
-        return treeService.getNodeById(nodeId).get();
+    public ResponseEntity<Node> getNodeById(@PathVariable Long nodeId) {
+        try {
+            return ResponseEntity.ok(treeService.getNodeById(nodeId));
+        } catch (InvalidNodeParamException | NodeNotFoundException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     @GetMapping("/getDescendants/{nodeId}")
-    public List<TreeDTO> getDescendants(@PathVariable Long nodeId) {
-        return treeService.getNodeDescendants(nodeId);
+    public ResponseEntity<List<NodeDTO>> getDescendants(@PathVariable Long nodeId) {
+        try {
+            return ResponseEntity.ok(treeService.getNodeDescendants(nodeId));
+        } catch (InvalidNodeParamException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     @GetMapping("/add/{name}/{parentId}")
-    public void add(@PathVariable String name, @PathVariable Integer parentId) {
-        treeService.addNode(name, parentId);
+    public ResponseEntity<Void> add(@PathVariable String name, @PathVariable Integer parentId) {
+        try {
+            treeService.addNode(name, parentId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (InvalidNodeParamException | NodeNotFoundException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     @GetMapping("/change/{id}/{newParentId}")
-    public void changeParent(@PathVariable Long id, @PathVariable Integer newParentId) {
-        treeService.changeNodeParent(id, newParentId);
+    public ResponseEntity<Void> changeParent(@PathVariable Long id, @PathVariable Integer newParentId) {
+        try {
+            treeService.changeNodeParent(id, newParentId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (InvalidNodeParamException | NodeNotFoundException e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 }

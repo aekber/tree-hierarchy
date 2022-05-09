@@ -1,6 +1,7 @@
 package org.dumbo.model;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @NamedNativeQuery(query =   "WITH RECURSIVE CTE AS (\n" +
                             "    SELECT\n" +
@@ -31,7 +32,7 @@ import javax.persistence.*;
         name = "mappingNativeQuery",
         classes = {
                 @ConstructorResult(
-                        targetClass = org.dumbo.model.TreeDTO.class,
+                        targetClass = NodeDTO.class,
                         columns = {
                                 @ColumnResult( name = "id", type = Long.class),
                                 @ColumnResult( name = "parent", type = Integer.class),
@@ -43,7 +44,7 @@ import javax.persistence.*;
 )
 @Entity
 @Table(name="nodes")
-public class Tree {
+public class Node {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,10 +56,10 @@ public class Tree {
     @Column(name = "parent")
     private Integer parent;
 
-    public Tree() {
+    public Node() {
     }
 
-    public Tree(String name, Integer parent) {
+    public Node(String name, Integer parent) {
         this.name = name;
         this.parent = parent;
     }
@@ -85,5 +86,27 @@ public class Tree {
 
     public void setParent(Integer parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node node = (Node) o;
+        return id.equals(node.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Tree{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", parent=" + parent +
+                '}';
     }
 }

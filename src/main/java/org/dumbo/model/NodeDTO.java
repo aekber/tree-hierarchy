@@ -2,14 +2,14 @@ package org.dumbo.model;
 
 import java.util.Objects;
 
-public class TreeDTO {
+public class NodeDTO {
 
 	private Long id;
 	private Integer parent;
 	private Long root;
 	private Integer height;
 
-	public TreeDTO(Long id, Integer parent, Long root, Integer height) {
+	public NodeDTO(Long id, Integer parent, Long root, Integer height) {
 		this.id = id;
 		this.parent = parent;
 		this.root = root;
@@ -52,8 +52,8 @@ public class TreeDTO {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		TreeDTO treeDTO = (TreeDTO) o;
-		return Objects.equals(id, treeDTO.id) && Objects.equals(parent, treeDTO.parent) && Objects.equals(root, treeDTO.root) && Objects.equals(height, treeDTO.height);
+		NodeDTO nodeDTO = (NodeDTO) o;
+		return Objects.equals(id, nodeDTO.id) && Objects.equals(parent, nodeDTO.parent) && Objects.equals(root, nodeDTO.root) && Objects.equals(height, nodeDTO.height);
 	}
 
 	@Override
