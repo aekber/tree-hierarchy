@@ -12,4 +12,5 @@ public interface TreeRepository extends CrudRepository<Node, Long> {
 
     @Query(nativeQuery = true, name = "TreeDTO.getDescendantsByNodeId")
     List<NodeDTO> getDescendantsByNodeId(@Param("parentPath") Long id);
+    List<Node> findByParentIsNull();
 }

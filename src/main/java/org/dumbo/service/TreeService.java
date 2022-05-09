@@ -2,6 +2,7 @@ package org.dumbo.service;
 
 import org.dumbo.exception.InvalidNodeParamException;
 import org.dumbo.exception.NodeNotFoundException;
+import org.dumbo.exception.OnlyOneRootNodeAllowedException;
 import org.dumbo.model.Node;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +27,12 @@ public class TreeService {
             throw new InvalidNodeParamException("Invalid node id: " + id);
         }
 
-        return treeRepository.findById(id)
-                .orElseThrow(() -> new NodeNotFoundException("Node with id: " + id + " not found!"));
+        Optional<Node> node = treeRepository.findById(id);
+        if(!node.isPresent()) {
+            throw new NodeNotFoundException("Node with id: " + id + " not found!");
+        }
+
+        return node.get();
     }
 
     @Transactional(readOnly = true)
@@ -39,21 +44,28 @@ public class TreeService {
     }
 
     @Transactional
-    public void addNode(String name, Integer parentId) throws InvalidNodeParamException, NodeNotFoundException {
-        if(name == null || name.isEmpty() || parentId == null){ // There can be only one root node, parentId == null
-            throw new InvalidNodeParamException("Invalid node parameter! name: " + name + ", parent id: " + parentId);
+    public Node addNode(Node node) throws InvalidNodeParamException, NodeNotFoundException, OnlyOneRootNodeAllowedException {
+        if(node == null || node.getName().isEmpty()){
+            throw new InvalidNodeParamException("Invalid node parameter! node: " + (node == null ? null : node.getName()) + ", parent id: " + node.getParent());
         }
 
-        Optional<Node> node = treeRepository.findById(parentId.longValue());
-        if(!node.isPresent()){
-            throw new NodeNotFoundException("Node with parent id: " + parentId + " not found!");
+        if(node.getParent() != null) { // if parent is null, then that means it is root. No need to check if node exists or not.
+            Optional<Node> parentNode = treeRepository.findById(node.getParent().longValue());
+            if (!parentNode.isPresent()) {
+                throw new NodeNotFoundException("Node with parent id: " + node.getParent() + " not found!");
+            }
+        } else { // A root node is being tried to add. Then check if there is already one.
+            List<Node> list = treeRepository.findByParentIsNull();
+            if(list.size() == 1){
+                throw new OnlyOneRootNodeAllowedException("Only one root node is allowed. Please check parent node id!");
+            }
         }
 
-        treeRepository.save(new Node(name, parentId));
+        return treeRepository.save(node);
     }
 
     @Transactional
-    public void changeNodeParent(Long id, Integer newParentId) throws InvalidNodeParamException, NodeNotFoundException {
+    public Node changeNodeParent(Long id, Integer newParentId) throws InvalidNodeParamException, NodeNotFoundException {
         if(id == null || newParentId == null){
             throw new InvalidNodeParamException("Invalid node parameter! id: " + id + ", new parent id: " + newParentId);
         }
@@ -70,7 +82,7 @@ public class TreeService {
 
         Node updatedNode = node.get();
         updatedNode.setParent(newParentId);
-        treeRepository.save(updatedNode);
+        return treeRepository.save(updatedNode);
     }
 
 }

@@ -2,6 +2,7 @@ package org.dumbo.controller;
 
 import org.dumbo.exception.InvalidNodeParamException;
 import org.dumbo.exception.NodeNotFoundException;
+import org.dumbo.exception.OnlyOneRootNodeAllowedException;
 import org.dumbo.model.Node;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.dumbo.model.NodeDTO;
 import org.dumbo.service.TreeService;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -41,21 +43,19 @@ public class TreeController {
         }
     }
 
-    @GetMapping("/add/{name}/{parentId}")
-    public ResponseEntity<Void> add(@PathVariable String name, @PathVariable Integer parentId) {
+    @PostMapping("/add/{parentId}")
+    public ResponseEntity<Node> add(@PathVariable Integer parentId, @Valid @RequestBody Node node) {
         try {
-            treeService.addNode(name, parentId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (InvalidNodeParamException | NodeNotFoundException e){
+            return ResponseEntity.ok(treeService.addNode(node));
+        } catch (InvalidNodeParamException | NodeNotFoundException | OnlyOneRootNodeAllowedException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 
     @GetMapping("/change/{id}/{newParentId}")
-    public ResponseEntity<Void> changeParent(@PathVariable Long id, @PathVariable Integer newParentId) {
+    public ResponseEntity<Node> changeParent(@PathVariable Long id, @PathVariable Integer newParentId) {
         try {
-            treeService.changeNodeParent(id, newParentId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok(treeService.changeNodeParent(id, newParentId));
         } catch (InvalidNodeParamException | NodeNotFoundException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }

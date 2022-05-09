@@ -64,6 +64,12 @@ public class Node {
         this.parent = parent;
     }
 
+    public Node(Long id, String name, Integer parent) {
+        this.id = id;
+        this.name = name;
+        this.parent = parent;
+    }
+
     public Long getId() {
         return id;
     }
