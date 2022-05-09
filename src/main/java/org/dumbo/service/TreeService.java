@@ -27,12 +27,7 @@ public class TreeService {
             throw new InvalidNodeParamException("Invalid node id: " + id);
         }
 
-        Optional<Node> node = treeRepository.findById(id);
-        if(!node.isPresent()) {
-            throw new NodeNotFoundException("Node with id: " + id + " not found!");
-        }
-
-        return node.get();
+        return treeRepository.findById(id).orElseThrow(() -> new NodeNotFoundException("Node with id: " + id + " not found!"));
     }
 
     @Transactional(readOnly = true)
@@ -45,15 +40,12 @@ public class TreeService {
 
     @Transactional
     public Node addNode(Node node) throws InvalidNodeParamException, NodeNotFoundException, OnlyOneRootNodeAllowedException {
-        if(node == null || node.getName().isEmpty()){
-            throw new InvalidNodeParamException("Invalid node parameter! node: " + (node == null ? null : node.getName()) + ", parent id: " + node.getParent());
+        if(node == null){
+            throw new InvalidNodeParamException("Invalid node parameter! node is null ");
         }
 
         if(node.getParent() != null) { // if parent is null, then that means it is root. No need to check if node exists or not.
-            Optional<Node> parentNode = treeRepository.findById(node.getParent().longValue());
-            if (!parentNode.isPresent()) {
-                throw new NodeNotFoundException("Node with parent id: " + node.getParent() + " not found!");
-            }
+            treeRepository.findById(node.getParent().longValue()).orElseThrow(() -> new NodeNotFoundException("Node with parent id: " + node.getParent() + " not found!"));
         } else { // A root node is being tried to add. Then check if there is already one.
             List<Node> list = treeRepository.findByParentIsNull();
             if(list.size() == 1){

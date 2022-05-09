@@ -43,8 +43,8 @@ public class TreeController {
         }
     }
 
-    @PostMapping("/add/{parentId}")
-    public ResponseEntity<Node> add(@PathVariable Integer parentId, @Valid @RequestBody Node node) {
+    @PostMapping("/add")
+    public ResponseEntity<Node> add(@RequestBody Node node) {
         try {
             return ResponseEntity.ok(treeService.addNode(node));
         } catch (InvalidNodeParamException | NodeNotFoundException | OnlyOneRootNodeAllowedException e){
