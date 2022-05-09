@@ -25,8 +25,7 @@ public class TreeService {
 
     @Transactional(readOnly = true)
     public List<TreeDTO> getNodeDescendants(Long id) {
-        List<Tree> nodes = treeRepository.getDescendantsByNodeId(id);
-        return nodes.stream().map(node -> new TreeDTO(node.getId(), node.getParent(), node.getRoot(), node.getLevel())).collect(Collectors.toList());
+        return treeRepository.getDescendantsByNodeId(id);
     }
 
     @Transactional
