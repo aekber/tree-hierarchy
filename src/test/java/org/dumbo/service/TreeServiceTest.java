@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +58,12 @@ public class TreeServiceTest {
     @Test(expected = InvalidNodeParamException.class)
     public void testGetNodeDescendants_invalidParam()  throws Exception {
         treeService.getNodeDescendants(null);
+    }
+
+    @Test(expected = NodeNotFoundException.class)
+    public void testGetNodeDescendants_notNotFound()  throws Exception {
+        when(mockTreeRepository.getDescendantsByNodeId(3L)).thenReturn(new ArrayList<>());
+        treeService.getNodeDescendants(3L);
     }
 
     @Test

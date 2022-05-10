@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,6 +53,17 @@ public class TreeControllerIT {
     }
 
     @Test
+    public void getDescendants_whenNodeNotExists_thenThrowException() throws Exception {
+        // when - action
+        ResultActions response = mockMvc.perform(get("/tree/getDescendants/3333"));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound());
+        response.andDo(print());
+        response.andExpect(status().reason(containsString("Node with id: 3333 not found!")));
+    }
+
+    @Test
     public void addNode_whenANewNode_thenReturnNewNode() throws Exception{
         // when - action
         ResultActions response = mockMvc.perform(post("/tree/add").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\", \"parent\":12}"));
@@ -66,16 +77,39 @@ public class TreeControllerIT {
     }
 
     @Test
+    public void addNode_whenParentNodeNotExists_thenThrowException() throws Exception{
+        // when - action
+        ResultActions response = mockMvc.perform(post("/tree/add").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\", \"parent\":2222}"));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound());
+        response.andDo(print());
+        response.andExpect(status().reason(containsString("Node with parent id: 2222 not found!")));
+    }
+
+    @Test
     public void getNodeById_whenAnIdGiven_thenReturnNode() throws Exception{
         // when - action
-        ResultActions response = mockMvc.perform(get("/tree/get/3"));
+        ResultActions response = mockMvc.perform(get("/tree/get/22"));
 
         // then - verify the output
         response.andExpect(status().isOk());
         response.andDo(print());
-        response.andExpect(jsonPath("$.id").value(3));
-        response.andExpect(jsonPath("$.name").value("R. Sharma"));
-        response.andExpect(jsonPath("$.parent").value(1));
+        response.andExpect(jsonPath("$.id").value(22));
+        response.andExpect(jsonPath("$.parent").value(23));
+        response.andExpect(jsonPath("$.root").value(1));
+        response.andExpect(jsonPath("$.height").value(4));
+    }
+
+    @Test
+    public void getNodeById_whenNodeNotExist_thenThrowException() throws Exception{
+        // when - action
+        ResultActions response = mockMvc.perform(get("/tree/get/2222"));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound());
+        response.andDo(print());
+        response.andExpect(status().reason(containsString("Node with id: 2222 not found!")));
     }
 
     @Test
@@ -89,5 +123,25 @@ public class TreeControllerIT {
         response.andExpect(jsonPath("$.id").value(19));
         response.andExpect(jsonPath("$.name").value("Rishabh Pant"));
         response.andExpect(jsonPath("$.parent").value(3));
+    }
+
+    @Test
+    public void changeParent_whenNodeNotExists_thenThrowException() throws Exception{
+        // when - action
+        ResultActions response = mockMvc.perform(get("/tree/change/3333/3"));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound());
+        response.andDo(print());
+        response.andExpect(status().reason(containsString("Node with id: 3333 not found!")));
+
+
+        // when - action
+        response = mockMvc.perform(get("/tree/change/4/4444"));
+
+        // then - verify the output
+        response.andExpect(status().isNotFound());
+        response.andDo(print());
+        response.andExpect(status().reason(containsString("Node with parent id: 4444 not found!")));
     }
 }

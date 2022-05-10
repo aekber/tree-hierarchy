@@ -37,7 +37,7 @@ public class TreeController {
     public ResponseEntity<List<NodeDTO>> getDescendants(@PathVariable Long nodeId) {
         try {
             return ResponseEntity.ok(treeService.getNodeDescendants(nodeId));
-        } catch (InvalidNodeParamException e){
+        } catch (InvalidNodeParamException | NodeNotFoundException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }

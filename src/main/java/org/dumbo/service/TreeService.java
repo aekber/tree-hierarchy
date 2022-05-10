@@ -33,15 +33,21 @@ public class TreeService {
         }
 
         List<NodeDTO> dtoList = treeRepository.getDescendantsByNodeId(node.get().getId());
-        return dtoList.stream().filter(n -> n.getId().equals(id)).findFirst().orElse(null);
+        return dtoList.stream().filter(n -> n.getId().equals(id)).findFirst().orElseThrow(() -> new NodeNotFoundException("Node with id: " + id + " not found!"));
     }
 
     @Transactional(readOnly = true)
-    public List<NodeDTO> getNodeDescendants(Long id) throws InvalidNodeParamException {
+    public List<NodeDTO> getNodeDescendants(Long id) throws InvalidNodeParamException, NodeNotFoundException {
         if(id == null){
             throw new InvalidNodeParamException("Invalid node id: " + id);
         }
-        return treeRepository.getDescendantsByNodeId(id);
+
+        List<NodeDTO> descendants = treeRepository.getDescendantsByNodeId(id);
+        if(descendants.size() == 0){
+            throw new NodeNotFoundException("Node with id: " + id + " not found!");
+        }
+
+        return descendants;
     }
 
     @Transactional
