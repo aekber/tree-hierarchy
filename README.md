@@ -45,9 +45,33 @@ The table layout looks like this:
 CREATE TABLE IF NOT EXISTS nodes(id SERIAL PRIMARY KEY, name text not null, parent INTEGER);
 ```
 
+CTE(Common Table Expression) allows to run recursive queries in the hierarchy. This helps a lot to utilize methods like
+finding heights and relations between nodes.
 
+```
+WITH RECURSIVE CTE AS (SELECT
+         id,
+         name,
+         parent,
+         1 as root,
+         0 as level     
+     FROM nodes     
+     WHERE id = ?     
+     UNION
+     SELECT
+         e.id,
+         e.name,
+         e.parent,
+         (SELECT n1.id FROM nodes n1 WHERE n1.parent is null),
+         s.level + 1     
+     FROM
+         nodes e             
+     INNER JOIN subordinates s ON s.id = e.parent ) 
+     SELECT * FROM CTE c
+```
 
-Developed with Java 8 under Ubuntu 20.04 LTS.
+The query above returns descendant nodes and height of the given node id. 
+Most of the business logic has been implemented here.
 
 # Build
 
@@ -102,7 +126,9 @@ The project is developed under Ubuntu 20.04 with Java 11
 
 # Troubleshooting
 
-Run this command :
+In case of issue( like this ERROR: duplicate key value violates unique constraint "nodes_pkey"
+Detail: Key (id)=(1) already exists.) during adding a new node to the tree, the sequence
+info needs to be updated with this command:
 
 ```
 SELECT setval(pg_get_serial_sequence('nodes', 'id'), coalesce(max(id)+1, 1), false) FROM nodes;

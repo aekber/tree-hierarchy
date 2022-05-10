@@ -27,6 +27,7 @@ public class TreeService {
             throw new InvalidNodeParamException("Invalid node id: " + id);
         }
 
+        // First find root node to be able to find height of given node in the full hierarchy
         Optional<Node> node = treeRepository.findByParentIsNull();
         if(!node.isPresent()){
             throw new NodeNotFoundException("Root node not found!");
@@ -42,6 +43,7 @@ public class TreeService {
             throw new InvalidNodeParamException("Invalid node id: " + id);
         }
 
+        // Even if there is no descendant of given node, query should return at least node itself. Otherwise node does not exist.
         List<NodeDTO> descendants = treeRepository.getDescendantsByNodeId(id);
         if(descendants.size() == 0){
             throw new NodeNotFoundException("Node with id: " + id + " not found!");
@@ -76,6 +78,7 @@ public class TreeService {
             throw new InvalidNodeParamException("Invalid node parameter! id: " + id + ", new parent id: " + newParentId);
         }
 
+        // Check whether given nodes exist
         Optional<Node> node = treeRepository.findById(id);
         if(!node.isPresent()){
             throw new NodeNotFoundException("Node with id: " + id + " not found!");

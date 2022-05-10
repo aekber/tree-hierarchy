@@ -63,7 +63,6 @@ public class TreeControllerIT {
         response.andExpect(status().reason(containsString("Node with id: 3333 not found!")));
     }
 
-    @Test
     public void addNode_whenANewNode_thenReturnNewNode() throws Exception{
         // when - action
         ResultActions response = mockMvc.perform(post("/tree/add").contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Test\", \"parent\":12}"));
@@ -121,7 +120,7 @@ public class TreeControllerIT {
         response.andExpect(status().isOk());
         response.andDo(print());
         response.andExpect(jsonPath("$.id").value(19));
-        response.andExpect(jsonPath("$.name").value("Rishabh Pant"));
+        response.andExpect(jsonPath("$.name").value("Test19 Test19"));
         response.andExpect(jsonPath("$.parent").value(3));
     }
 
