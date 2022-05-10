@@ -11,7 +11,6 @@ import org.dumbo.model.NodeDTO;
 import org.dumbo.service.TreeService;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
 import java.util.List;
 
 
@@ -26,7 +25,7 @@ public class TreeController {
     }
 
     @GetMapping("/get/{nodeId}")
-    public ResponseEntity<Node> getNodeById(@PathVariable Long nodeId) {
+    public ResponseEntity<NodeDTO> getNodeById(@PathVariable Long nodeId) {
         try {
             return ResponseEntity.ok(treeService.getNodeById(nodeId));
         } catch (InvalidNodeParamException | NodeNotFoundException e){

@@ -22,12 +22,18 @@ public class TreeService {
     }
 
     @Transactional(readOnly = true)
-    public Node getNodeById(Long id) throws InvalidNodeParamException, NodeNotFoundException {
+    public NodeDTO getNodeById(Long id) throws InvalidNodeParamException, NodeNotFoundException {
         if(id == null){
             throw new InvalidNodeParamException("Invalid node id: " + id);
         }
 
-        return treeRepository.findById(id).orElseThrow(() -> new NodeNotFoundException("Node with id: " + id + " not found!"));
+        Optional<Node> node = treeRepository.findByParentIsNull();
+        if(!node.isPresent()){
+            throw new NodeNotFoundException("Root node not found!");
+        }
+
+        List<NodeDTO> dtoList = treeRepository.getDescendantsByNodeId(node.get().getId());
+        return dtoList.stream().filter(n -> n.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Transactional(readOnly = true)
@@ -44,11 +50,13 @@ public class TreeService {
             throw new InvalidNodeParamException("Invalid node parameter! node is null ");
         }
 
-        if(node.getParent() != null) { // if parent is null, then that means it is root. No need to check if node exists or not.
+        if(node.getParent() != null) {
+            // if parent is null, then that means it is root. No need to check if node exists or not.
             treeRepository.findById(node.getParent().longValue()).orElseThrow(() -> new NodeNotFoundException("Node with parent id: " + node.getParent() + " not found!"));
-        } else { // A root node is being tried to add. Then check if there is already one.
-            List<Node> list = treeRepository.findByParentIsNull();
-            if(list.size() == 1){
+        } else {
+            // A root node is being tried to add. Then check if there is already one.
+            Optional<Node> rootNode = treeRepository.findByParentIsNull();
+            if(rootNode.isPresent()){
                 throw new OnlyOneRootNodeAllowedException("Only one root node is allowed. Please check parent node id!");
             }
         }

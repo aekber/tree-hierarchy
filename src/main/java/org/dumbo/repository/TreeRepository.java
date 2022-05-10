@@ -7,11 +7,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TreeRepository extends CrudRepository<Node, Long> {
 
     @Query(nativeQuery = true, name = "TreeDTO.getDescendantsByNodeId")
     List<NodeDTO> getDescendantsByNodeId(@Param("parentPath") Long id);
 
-    List<Node> findByParentIsNull();
+    Optional<Node> findByParentIsNull();
 }

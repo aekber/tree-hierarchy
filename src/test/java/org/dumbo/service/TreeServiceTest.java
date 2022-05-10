@@ -41,10 +41,17 @@ public class TreeServiceTest {
 
     @Test
     public void testNodeGetById() throws Exception {
-        when(mockTreeRepository.findById(3L)).thenReturn(Optional.of(new Node("Test node", null)));
-        Node node = treeService.getNodeById(3L);
-        assertEquals("Test node", node.getName());
-        assertNull(node.getParent());
+        when(mockTreeRepository.findByParentIsNull()).thenReturn(Optional.of(new Node(1L, "Root node", null)));
+        when(mockTreeRepository.getDescendantsByNodeId(1L)).thenReturn(Arrays.asList(new NodeDTO(3L, 1, 1L, 0),
+                                                                                     new NodeDTO(8L, 3, 1L, 1),
+                                                                                     new NodeDTO(9L, 3, 1L, 1),
+                                                                                     new NodeDTO(15L, 9, 1L, 2),
+                                                                                     new NodeDTO(11L, 10, 1L, 3)));
+        NodeDTO node = treeService.getNodeById(15L);
+        assertTrue(9 == node.getParent());
+        assertTrue(15 == node.getId());
+        assertTrue(1 == node.getRoot());
+        assertTrue(2 == node.getHeight());
     }
 
     @Test(expected = InvalidNodeParamException.class)
@@ -80,7 +87,7 @@ public class TreeServiceTest {
     @Test(expected = OnlyOneRootNodeAllowedException.class)
     public void testAddNode_rootAlreadyExists() throws Exception {
         Node node = new Node(1234L, "ali", null);
-        when(mockTreeRepository.findByParentIsNull()).thenReturn(Arrays.asList(new Node()));
+        when(mockTreeRepository.findByParentIsNull()).thenReturn(Optional.of(new Node()));
         treeService.addNode(node);
     }
 
